@@ -1,10 +1,9 @@
-
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.4.1
+    controller-gen.kubebuilder.io/version: v0.9.2
   creationTimestamp: null
   name: appservices.batch.schwarzeni.github.com
 spec:
@@ -138,6 +137,17 @@ spec:
                   - name
                   type: object
                 type: array
+              gateway_register_info:
+                properties:
+                  feature_enabled:
+                    type: boolean
+                  port:
+                    type: integer
+                  register_url:
+                    type: string
+                  service_path:
+                    type: string
+                type: object
               image:
                 type: string
               ports:
@@ -225,6 +235,7 @@ spec:
                     type: object
                 type: object
             required:
+            - gateway_register_info
             - image
             - replicas
             type: object
@@ -308,9 +319,3 @@ spec:
     storage: true
     subresources:
       status: {}
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: []
-  storedVersions: []

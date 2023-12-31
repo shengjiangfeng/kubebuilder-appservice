@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 
 	"github.com/go-logr/logr"
@@ -187,16 +188,37 @@ func newContainer(app *batchv1alpha1.AppService) []corev1.Container {
 		cport.ContainerPort = svcPort.TargetPort.IntVal
 		containerPorts = append(containerPorts, cport)
 	}
-	return []corev1.Container{
-		{
-			Name:            app.Name,
-			Image:           app.Spec.Image,
-			Resources:       app.Spec.Resources,
-			Ports:           containerPorts,
-			ImagePullPolicy: corev1.PullIfNotPresent,
-			Env:             app.Spec.Envs,
-		},
+	if app.Spec.GatewayRegisterInfo.FeatureEnabled {
+		return []corev1.Container{
+			{
+				Name:            app.Name,
+				Image:           app.Spec.Image,
+				Resources:       app.Spec.Resources,
+				Ports:           containerPorts,
+				ImagePullPolicy: corev1.PullIfNotPresent,
+				Env:             app.Spec.Envs,
+				Lifecycle: &corev1.Lifecycle{
+					PostStart: &corev1.Handler{Exec: &corev1.ExecAction{
+						Command: []string{"curl", fmt.Sprintf("-X PUT -d '{\"ID\": \"${HOSTNAME}\",\"Name\": \"%s\",\"Address\": \"${POD_IP}\",\"Port\": %d,\"Tags\": [\"\"],\"Meta\": {}}' http://consul-svc.consul:8500/v1/agent/service/register", app.Name, app.Spec.GatewayRegisterInfo.Port)},
+					}},
+					PreStop: &corev1.Handler{Exec: &corev1.ExecAction{
+						Command: []string{"curl", fmt.Sprintf("-X PUT -d '{\"ID\": \"${HOSTNAME}\",\"Name\": \"%s\",\"Address\": \"${POD_IP}\",\"Port\": %d,\"Tags\": [\"\"],\"Meta\": {}}' http://consul-svc.consul:8500/v1/agent/service/deregister/${HOSTNAME}", app.Name, app.Spec.GatewayRegisterInfo.Port)},
+					},
+					}}},
+		}
+	} else {
+		return []corev1.Container{
+			{
+				Name:            app.Name,
+				Image:           app.Spec.Image,
+				Resources:       app.Spec.Resources,
+				Ports:           containerPorts,
+				ImagePullPolicy: corev1.PullIfNotPresent,
+				Env:             app.Spec.Envs,
+			},
+		}
 	}
+
 }
 
 func NewService(app *batchv1alpha1.AppService) *corev1.Service {

@@ -30,11 +30,12 @@ type AppServiceSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	Replicas  *int32                      `json:"replicas"`
-	Image     string                      `json:"image"`
-	Resources corev1.ResourceRequirements `json:"resources,omitempty"`
-	Envs      []corev1.EnvVar             `json:"envs,omitempty"`
-	Ports     []corev1.ServicePort        `json:"ports,omitempty"`
+	Replicas            *int32                      `json:"replicas"`
+	Image               string                      `json:"image"`
+	Resources           corev1.ResourceRequirements `json:"resources,omitempty"`
+	GatewayRegisterInfo GatewayRegisterInfo         `json:"gateway_register_info"`
+	Envs                []corev1.EnvVar             `json:"envs,omitempty"`
+	Ports               []corev1.ServicePort        `json:"ports,omitempty"`
 }
 
 // AppServiceStatus defines the observed state of AppService
@@ -43,6 +44,13 @@ type AppServiceStatus struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	appsv1.DeploymentStatus `json:",inline"`
+}
+
+type GatewayRegisterInfo struct {
+	FeatureEnabled bool   `json:"feature_enabled,omitempty"`
+	RegisterUrl    string `json:"register_url,omitempty"`
+	ServicePath    string `json:"service_path,,omitempty"` // 服务http访问路径,管理网关注册
+	Port           int    `json:"port,omitempty"`
 }
 
 //+kubebuilder:object:root=true
