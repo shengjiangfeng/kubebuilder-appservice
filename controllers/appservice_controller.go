@@ -199,9 +199,9 @@ func newContainer(app *batchv1alpha1.AppService) []corev1.Container {
 				Resources:       app.Spec.Resources,
 				Ports:           containerPorts,
 				ImagePullPolicy: corev1.PullIfNotPresent,
-				Command:         []string{"/bin/sh", "-c", "--"},
-				Args:            []string{"while true; do sleep 3600; done;"},
-				Env:             app.Spec.Envs,
+				//Command:         []string{"/bin/sh", "-c", "--"},
+				//Args:            []string{"while true; do sleep 3600; done;"},
+				Env: app.Spec.Envs,
 				Lifecycle: &corev1.Lifecycle{
 					PostStart: &corev1.Handler{Exec: &corev1.ExecAction{
 						Command: []string{"/bin/sh", "-c", fmt.Sprintf(`curl -X PUT -d  "{\"ID\": \"${HOSTNAME}\",\"Name\": \"%s\",\"Address\": \"${POD_IP}\",\"Port\": %d,\"Tags\": [\"\"],\"Meta\": {}}"  http://consul-svc.consul:8500/v1/agent/service/register `, app.Name, app.Spec.GatewayRegisterInfo.Port)},

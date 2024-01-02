@@ -10,7 +10,7 @@ spec:
     service_path: "/usercenter"
 
   replicas: 1
-  image: appropriate/curl:latest
+  image: appropriate/curl:curl
   ports:
     - port: 80
       targetPort: 80
