@@ -19,8 +19,6 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"reflect"
-
 	"github.com/go-logr/logr"
 	batchv1alpha1 "github.com/schwarzeni/kubebuilder-appservice/api/v1alpha1"
 	appsv1 "k8s.io/api/apps/v1"
@@ -30,6 +28,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/json"
+	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -182,7 +181,7 @@ func NewDeployment(app *batchv1alpha1.AppService) *appsv1.Deployment {
 }
 
 func newContainer(app *batchv1alpha1.AppService) []corev1.Container {
-	containerPorts := []corev1.ContainerPort{}
+	var containerPorts []corev1.ContainerPort
 	for _, svcPort := range app.Spec.Ports {
 		cport := corev1.ContainerPort{}
 		cport.ContainerPort = svcPort.TargetPort.IntVal
@@ -200,13 +199,16 @@ func newContainer(app *batchv1alpha1.AppService) []corev1.Container {
 				Resources:       app.Spec.Resources,
 				Ports:           containerPorts,
 				ImagePullPolicy: corev1.PullIfNotPresent,
+				Command:         []string{"/bin/sh", "-c", "--"},
+				Args:            []string{"while true; do sleep 3600; done;"},
 				Env:             app.Spec.Envs,
 				Lifecycle: &corev1.Lifecycle{
 					PostStart: &corev1.Handler{Exec: &corev1.ExecAction{
-						Command: []string{"curl", fmt.Sprintf("-X PUT -d '{\"ID\": \"${HOSTNAME}\",\"Name\": \"%s\",\"Address\": \"${POD_IP}\",\"Port\": %d,\"Tags\": [\"\"],\"Meta\": {}}' http://consul-svc.consul:8500/v1/agent/service/register", app.Name, app.Spec.GatewayRegisterInfo.Port)},
+						Command: []string{"/bin/sh", "-c", fmt.Sprintf(`curl -X PUT -d  "{\"ID\": \"${HOSTNAME}\",\"Name\": \"%s\",\"Address\": \"${POD_IP}\",\"Port\": %d,\"Tags\": [\"\"],\"Meta\": {}}"  http://consul-svc.consul:8500/v1/agent/service/register `, app.Name, app.Spec.GatewayRegisterInfo.Port)},
+						//Command: []string{"/bin/sh", "-c", " /usr/bin/curl https://www.baidu.com  "},
 					}},
 					PreStop: &corev1.Handler{Exec: &corev1.ExecAction{
-						Command: []string{"curl", fmt.Sprintf("-X PUT -d '{\"ID\": \"${HOSTNAME}\",\"Name\": \"%s\",\"Address\": \"${POD_IP}\",\"Port\": %d,\"Tags\": [\"\"],\"Meta\": {}}' http://consul-svc.consul:8500/v1/agent/service/deregister/${HOSTNAME}", app.Name, app.Spec.GatewayRegisterInfo.Port)},
+						Command: []string{"/bin/sh", "-c", fmt.Sprintf(`curl -X PUT -d  "{\"ID\": \"${HOSTNAME}\",\"Name\": \"%s\",\"Address\": \"${POD_IP}\",\"Port\": %d,\"Tags\": [\"\"],\"Meta\": {}}"  http://consul-svc.consul:8500/v1/agent/service/deregister/${HOSTNAME} `, app.Name, app.Spec.GatewayRegisterInfo.Port)},
 					},
 					}}},
 		}

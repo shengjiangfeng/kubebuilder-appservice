@@ -1,10 +1,16 @@
 apiVersion: batch.schwarzeni.github.com/v1alpha1
 kind: AppService
 metadata:
-  name: nginx-app
+  name: usercenter
 spec:
-  replicas: 2
-  image: nginx:alpine
+  gateway_register_info:
+    feature_enabled: true
+    register_url: controller
+    port: 80
+    service_path: "/usercenter"
+
+  replicas: 1
+  image: appropriate/curl:latest
   ports:
     - port: 80
       targetPort: 80
