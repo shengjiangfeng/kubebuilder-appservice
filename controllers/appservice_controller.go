@@ -189,6 +189,10 @@ func newContainer(app *batchv1alpha1.AppService) []corev1.Container {
 		containerPorts = append(containerPorts, cport)
 	}
 	if app.Spec.GatewayRegisterInfo.FeatureEnabled {
+		app.Spec.Envs = append(app.Spec.Envs, corev1.EnvVar{Name: "POD_IP", ValueFrom: &corev1.EnvVarSource{
+			FieldRef: &corev1.ObjectFieldSelector{
+				FieldPath: "status.podIP",
+			}}})
 		return []corev1.Container{
 			{
 				Name:            app.Name,
