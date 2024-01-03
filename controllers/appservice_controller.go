@@ -153,6 +153,11 @@ func (r *AppServiceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 func NewDeployment(app *batchv1alpha1.AppService) *appsv1.Deployment {
 	labels := map[string]string{"app": app.Name}
 	selector := &metav1.LabelSelector{MatchLabels: labels}
+	// 	ctrl "sigs.k8s.io/controller-runtime" #通过这个SetControllerReference 来设置父子关系
+	//if err := ctrl.SetControllerReference(AppService, deployment, r.Scheme); err != nil {
+	//	l.Error(err, "Failed to SetControllerReference,will requeue after a short time.")
+	//	//return ctrl.Result{RequeueAfter: GenericRequeueDuration}, err
+	//}
 	return &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
 			APIVersion: "apps/v1",
@@ -253,3 +258,5 @@ func NewService(app *batchv1alpha1.AppService) *corev1.Service {
 		},
 	}
 }
+
+//  todo 这边需要增加一些对status的判断
