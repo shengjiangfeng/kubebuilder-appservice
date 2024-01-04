@@ -41,6 +41,7 @@ type AppServiceSpec struct {
 // AppServiceStatus defines the observed state of AppService
 type AppServiceStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
+	// 这里可以加入自己想跟踪的状态，这个demo就不加了
 	// Important: Run "make" to regenerate code after modifying this file
 
 	appsv1.DeploymentStatus `json:",inline"`
