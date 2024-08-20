@@ -1,0 +1,12 @@
+apiVersion: batch.schwarzeni.github.com.schwarzeni.github.com/v1alpha1
+kind: Podingress
+metadata:
+  labels:
+    app.kubernetes.io/name: podingress
+    app.kubernetes.io/instance: podingress-sample
+    app.kubernetes.io/part-of: kubebuilder-appservice
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: kubebuilder-appservice
+  name: podingress-sample
+spec:
+  # TODO(user): Add fields here

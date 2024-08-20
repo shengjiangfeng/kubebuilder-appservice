@@ -32,7 +32,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	batchv1alpha1 "github.com/schwarzeni/kubebuilder-appservice/api/v1alpha1"
+	batchschwarzenigithubcomv1alpha1 "github.com/schwarzeni/kubebuilder-appservice/apis/batch.schwarzeni.github.com/v1alpha1"
 	"github.com/schwarzeni/kubebuilder-appservice/controllers"
+	batchschwarzenigithubcomcontrollers "github.com/schwarzeni/kubebuilder-appservice/controllers/batch.schwarzeni.github.com"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -45,6 +47,7 @@ func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
 	utilruntime.Must(batchv1alpha1.AddToScheme(scheme))
+	utilruntime.Must(batchschwarzenigithubcomv1alpha1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
@@ -84,6 +87,13 @@ func main() {
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "AppService")
+		os.Exit(1)
+	}
+	if err = (&batchschwarzenigithubcomcontrollers.PodingressReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Podingress")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

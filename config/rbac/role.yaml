@@ -85,3 +85,29 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - batch.schwarzeni.github.com.schwarzeni.github.com
+  resources:
+  - podingresses
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - batch.schwarzeni.github.com.schwarzeni.github.com
+  resources:
+  - podingresses/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - batch.schwarzeni.github.com.schwarzeni.github.com
+  resources:
+  - podingresses/status
+  verbs:
+  - get
+  - patch
+  - update

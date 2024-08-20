@@ -1,0 +1,31 @@
+# permissions for end users to edit podingresses.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: podingress-editor-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: kubebuilder-appservice
+    app.kubernetes.io/part-of: kubebuilder-appservice
+    app.kubernetes.io/managed-by: kustomize
+  name: podingress-editor-role
+rules:
+- apiGroups:
+  - batch.schwarzeni.github.com.schwarzeni.github.com
+  resources:
+  - podingresses
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - batch.schwarzeni.github.com.schwarzeni.github.com
+  resources:
+  - podingresses/status
+  verbs:
+  - get
